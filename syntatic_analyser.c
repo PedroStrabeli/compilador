@@ -172,7 +172,7 @@ int recognizeDeclareFunction(TokenArr *tokenArr) {
                 }
             break;
             case 1:
-                if (recognizeIdentificator(tokenArr)) {
+                if (t.type == TYPE_IDENTIFIER) {
                     tokenArr->pos++;
                     state = 2;
                 } else {
@@ -180,7 +180,7 @@ int recognizeDeclareFunction(TokenArr *tokenArr) {
                 }
             break;
             case 2:
-                if (recognizeIdentificators(tokenArr)) {
+                if (recognizeIdentificators(tokenArr)) { //CHECK
                     tokenArr->pos++;
                     state = 3;
                 } else {
@@ -262,7 +262,7 @@ int recognizeDeclareVariable(TokenArr *tokenArr) {
                 }
             break;
             case 1:
-                if (t.type == TYPE_DATATYPE) { //identify type here (int, float... -> lexic)
+                if (t.type == TYPE_DATATYPE) {
                     tokenArr->pos++;
                     state = 2;
                 } else {
@@ -270,7 +270,7 @@ int recognizeDeclareVariable(TokenArr *tokenArr) {
                 }
             break;
             case 2:
-                if if (t.type == TYPE_IDENTIFIER) {
+                if (t.type == TYPE_IDENTIFIER) {
                     tokenArr->pos++;
                     state = 3;
                 } else {
@@ -428,7 +428,7 @@ int recognizeBoolExpression(TokenArr *tokenArr) {
         t = tokenArr->tokens[tokenArr->pos];
         switch (state) {
             case 0:
-                if (t.type == TYPE_DATATYPE && strcmp(t.value, "boolean") == 0) {
+                if (t.type == TYPE_DATATYPE && strcmp(t.value, "boolean") == 0) { //identify type here (int, float... -> lexic)
                     tokenArr->pos++;
                     state = 1;
                 } else if (recognizeBoolExpression(tokenArr)) {
@@ -514,7 +514,7 @@ int recognizeArithExpression(TokenArr *tokenArr) {
                 syntaxMatch = 1;
             break;
             case 2:
-                if if (t.type == TYPE_OPERATOR) {
+                if (t.type == TYPE_OPERATOR) {
                     tokenArr->pos++;
                     state = 3;
                 } else {
@@ -567,7 +567,7 @@ int recognizeAttribution (TokenArr *tokenArr) {
                 }
             break;
             case 2:
-                if (t.type == TYPE_VALUE || recognizeFunctionCall(tokenArr)) {
+                if (t.type == TYPE_DATATYPE || recognizeFunctionCall(tokenArr)) {
                     tokenArr->pos++;
                     state = 3;
                 } else {
@@ -610,7 +610,7 @@ int recognizeCondicional (TokenArr *tokenArr) {
                 }
             break;
             case 2:
-                if if (t.type == TYPE_OPERATOR &&  strcmp(t.value, "then") == 0) {
+                if (t.type == TYPE_KEYWORD &&  strcmp(t.value, "then") == 0) {
                     tokenArr->pos++;
                     state = 3;
                 } else {
@@ -626,7 +626,7 @@ int recognizeCondicional (TokenArr *tokenArr) {
                 }
             break;
             case 4:
-                if (t.type == TYPE_OPERATOR &&  strcmp(t.value, "end") ==0) {
+                if (t.type == TYPE_KEYWORD &&  strcmp(t.value, "end") ==0) {
                     tokenArr->pos++;
                     state = 5;
                 } else if(recognizeAdditionalCondition(tokenArr)) {
@@ -637,7 +637,7 @@ int recognizeCondicional (TokenArr *tokenArr) {
                 }
             break;
             case 5:
-                if (t.type == TYPE_OPERATOR &&  strcmp(t.value, "if") ==0) {
+                if (t.type == TYPE_KEYWORD &&  strcmp(t.value, "if") ==0) {
                     tokenArr->pos++;
                     state = 7;
                 } else {
@@ -645,7 +645,7 @@ int recognizeCondicional (TokenArr *tokenArr) {
                 }
             break;
             case 6:
-                if (t.type == TYPE_OPERATOR &&  strcmp(t.value, "end") ==0) {
+                if (t.type == TYPE_KEYWORD &&  strcmp(t.value, "end") ==0) {
                     tokenArr->pos++;
                     state = 5;
                 } else {
@@ -683,7 +683,7 @@ int recognizeLoops (TokenArr *tokenArr) {
                 }
             break;
             case 1:
-                if (t.type == TYPE_SEPARATOR && strcmp(t.value, "(") == 0) { //identify type here (int, float... -> lexic)
+                if (t.type == TYPE_SEPARATOR && strcmp(t.value, "(") == 0) {
                     tokenArr->pos++;
                     state = 3;
                 } else {
@@ -691,7 +691,7 @@ int recognizeLoops (TokenArr *tokenArr) {
                 }
             break;
             case 2:
-                if if (t.type == TYPE_SEPARATOR && strcmp(t.value, "(") == 0) {
+                if (t.type == TYPE_SEPARATOR && strcmp(t.value, "(") == 0) {
                     tokenArr->pos++;
                     state = 4;
                 } else {
@@ -857,7 +857,7 @@ int recognizeInput (TokenArr *tokenArr) {
                 }
             break;
             case 1:
-                if (t.type == TYPE_SEPARATOR && strcmp(t.value, "(") == 0) { //identify type here (int, float... -> lexic)
+                if (t.type == TYPE_SEPARATOR && strcmp(t.value, "(") == 0) {
                     tokenArr->pos++;
                     state = 2;
                 } else {
@@ -865,7 +865,7 @@ int recognizeInput (TokenArr *tokenArr) {
                 }
             break;
             case 2:
-                if if (t.type == TYPE_IDENTIFIER) {
+                if (t.type == TYPE_IDENTIFIER) {
                     tokenArr->pos++;
                     state = 3;
                 } else {
@@ -908,7 +908,7 @@ int recognizePrint (TokenArr *tokenArr) {
                 }
             break;
             case 1:
-                if (t.type == TYPE_SEPARATOR && strcmp(t.value, "(") == 0) { //identify type here (int, float... -> lexic)
+                if (t.type == TYPE_SEPARATOR && strcmp(t.value, "(") == 0) {
                     tokenArr->pos++;
                     state = 2;
                 } else {
@@ -916,7 +916,7 @@ int recognizePrint (TokenArr *tokenArr) {
                 }
             break;
             case 2:
-                if if (t.type == TYPE_IDENTIFIER) {
+                if (t.type == TYPE_IDENTIFIER) {
                     tokenArr->pos++;
                     state = 3;
                 } else {
