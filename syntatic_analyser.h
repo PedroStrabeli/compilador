@@ -17,3 +17,4 @@ int recognizeFunctionCall (TokenArr *tokenArr);
 int recognizeInput (TokenArr *tokenArr);
 int recognizePrint (TokenArr *tokenArr);
 int recognizeAdditionalCondition(TokenArr *tokenArr);
+int recognizeArgument(TokenArray *tokenArr);

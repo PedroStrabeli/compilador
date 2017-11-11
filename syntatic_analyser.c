@@ -419,7 +419,7 @@ int recognizeExpression(TokenArr *tokenArr) {
     return syntaxMatch;
 }
 
-int recognizeBoolExpression(TokenArr *tokenArr) { //TODO
+int recognizeBoolExpression(TokenArr *tokenArr) {
     int state = 0;
     int syntaxMatch = -1;
     int startingToken = tokenArr->pos;
@@ -431,38 +431,51 @@ int recognizeBoolExpression(TokenArr *tokenArr) { //TODO
                 if (t.type == TYPE_DATATYPE && strcmp(t.value, "boolean") == 0) {
                     tokenArr->pos++;
                     state = 1;
-                } else {
-                    syntaxMatch = 0;
-                }
-            break;
-            case 1:
-                if (t.type == TYPE_DATATYPE) {
+                } else if (recognizeBoolExpression(tokenArr)) {
                     tokenArr->pos++;
                     state = 2;
-                } else {
-                    syntaxMatch = 0;
-                }
-            break;
-            case 2:
-                if if (t.type == TYPE_IDENTIFIER) {
+                } else if (recognizeArithExpression(tokenArr)) {
                     tokenArr->pos++;
                     state = 3;
                 } else {
                     syntaxMatch = 0;
                 }
             break;
+            case 1:
+                printf("Expressao booleana reconhecida");
+                syntaxMatch = 1;
+            break;
+            case 2:
+                if (t.type == TYPE_OPERATOR && (strcmp(t.value, "&&") == 0 || strcmp(t.value, "||") == 0)) {
+                    tokenArr->pos++;
+                    state = 5;
+                } else {
+                    syntaxMatch = 0;
+                }
+            break;
             case 3:
-                if (recognizeDeclareVariable(tokenArr)) {
+                if (t.type == TYPE_OPERATOR && (strcmp(t.value, ">") == 0 || strcmp(t.value, ">=") == 0 || strcmp(t.value, "<") == 0 || strcmp(t.value, "<=") == 0 || strcmp(t.value, "==") == 0 || strcmp(t.value, "!=") == 0)) {
                     tokenArr->pos++;
                     state = 4;
                 } else {
-                    printf("Variavel reconhecida");
-                    syntaxMatch = 1;
+                    syntaxMatch = 0;
                 }
             break;
             case 4:
-                printf("Variavel reconhecida");
-                syntaxMatch = 1;
+                if (recognizeArithExpression(tokenArr)) {
+                    tokenArr->pos++;
+                    state = 1;
+                } else {
+                    syntaxMatch = 0;
+                }
+            break;
+            case 5:
+                if (recognizeBoolExpression(tokenArr)) {
+                    tokenArr->pos++;
+                    state = 1;
+                } else {
+                    syntaxMatch = 0;
+                }
             break;
 
             default:
@@ -477,7 +490,7 @@ int recognizeBoolExpression(TokenArr *tokenArr) { //TODO
     return syntaxMatch;
 }
 
-int recognizeArithExpression(TokenArr *tokenArr) { //TODO
+int recognizeArithExpression(TokenArr *tokenArr) {
     int state = 0;
     int syntaxMatch = -1;
     int startingToken = tokenArr->pos;
@@ -486,23 +499,22 @@ int recognizeArithExpression(TokenArr *tokenArr) { //TODO
         t = tokenArr->tokens[tokenArr->pos];
         switch (state) {
             case 0:
-                if (t.type == TYPE_KEYWORD && strcmp(t.value, "var") == 0) {
+                if (t.type == TYPE_DATATYPE) {
                     tokenArr->pos++;
                     state = 1;
-                } else {
-                    syntaxMatch = 0;
-                }
-            break;
-            case 1:
-                if (t.type == TYPE_DATATYPE) {
+                } else if(recognizeArithExpression(tokenArr)) {
                     tokenArr->pos++;
                     state = 2;
                 } else {
                     syntaxMatch = 0;
                 }
             break;
+            case 1:
+                printf("Expressao aritmetica reconhecida");
+                syntaxMatch = 1;
+            break;
             case 2:
-                if if (t.type == TYPE_IDENTIFIER) {
+                if if (t.type == TYPE_OPERATOR) {
                     tokenArr->pos++;
                     state = 3;
                 } else {
@@ -510,17 +522,12 @@ int recognizeArithExpression(TokenArr *tokenArr) { //TODO
                 }
             break;
             case 3:
-                if (recognizeDeclareVariable(tokenArr)) {
+                if(recognizeArithExpression(tokenArr)) {
                     tokenArr->pos++;
-                    state = 4;
+                    state = 1;
                 } else {
-                    printf("Variavel reconhecida");
-                    syntaxMatch = 1;
+                    syntaxMatch = 0;
                 }
-            break;
-            case 4:
-                printf("Variavel reconhecida");
-                syntaxMatch = 1;
             break;
 
             default:
@@ -656,7 +663,7 @@ int recognizeCondicional (TokenArr *tokenArr) {
     }
 }
 
-int recognizeLoops (TokenArr *tokenArr) { //TODO
+int recognizeLoops (TokenArr *tokenArr) {
     int state = 0;
     int syntaxMatch = -1;
     int startingToken = tokenArr->pos;
@@ -665,40 +672,106 @@ int recognizeLoops (TokenArr *tokenArr) { //TODO
         t = tokenArr->tokens[tokenArr->pos];
         switch (state) {
             case 0:
-                if (t.type == TYPE_KEYWORD && strcmp(t.value, "var") == 0) {
+                if (t.type == TYPE_KEYWORD && strcmp(t.value, "for") == 0) {
                     tokenArr->pos++;
                     state = 1;
-                } else {
-                    syntaxMatch = 0;
-                }
-            break;
-            case 1:
-                if (t.type == TYPE_DATATYPE) { //identify type here (int, float... -> lexic)
+                } else if (t.type == TYPE_KEYWORD && strcmp(t.value, "while") == 0) {
                     tokenArr->pos++;
                     state = 2;
                 } else {
                     syntaxMatch = 0;
                 }
             break;
-            case 2:
-                if if (t.type == TYPE_IDENTIFIER) {
+            case 1:
+                if (t.type == TYPE_SEPARATOR && strcmp(t.value, "(") == 0) { //identify type here (int, float... -> lexic)
                     tokenArr->pos++;
                     state = 3;
                 } else {
                     syntaxMatch = 0;
                 }
             break;
-            case 3:
-                if (recognizeDeclareVariable(tokenArr)) {
+            case 2:
+                if if (t.type == TYPE_SEPARATOR && strcmp(t.value, "(") == 0) {
                     tokenArr->pos++;
                     state = 4;
                 } else {
-                    printf("Variavel reconhecida");
-                    syntaxMatch = 1;
+                    syntaxMatch = 0;
+                }
+            break;
+            case 3:
+                if (recognizeAttribution(tokenArr)) {
+                    tokenArr->pos++;
+                    state = 5;
+                } else {
+                    syntaxMatch = 0;
                 }
             break;
             case 4:
-                printf("Variavel reconhecida");
+                if (recognizeExpression(tokenArr)) {
+                    tokenArr->pos++;
+                    state = 6;
+                } else {
+                    syntaxMatch = 0;
+                }
+            break;
+            case 5:
+                if (t.type == TYPE_SEPARATOR && strcmp(t.value, ";") == 0) {
+                    tokenArr->pos++;
+                    state = 7;
+                } else {
+                    syntaxMatch = 0;
+                }
+            break;
+            case 6:
+                if (t.type == TYPE_SEPARATOR && strcmp(t.value, ")") == 0) {
+                    tokenArr->pos++;
+                    state = 8;
+                } else {
+                    syntaxMatch = 0;
+                }
+            break;
+            case 7:
+                if (recognizeExpression(tokenArr)) {
+                    tokenArr->pos++;
+                    state = 9;
+                } else {
+                    syntaxMatch = 0;
+                }
+            break;
+            case 8:
+                if (t.type == TYPE_KEYWORD && strcmp(t.value, "loop") == 0) {
+                    tokenArr->pos++;
+                    state = 4;
+                } else {
+                    syntaxMatch = 0;
+                }
+            break;
+            case 9:
+                if (t.type == TYPE_SEPARATOR && strcmp(t.value, ";") == 0) {
+                    tokenArr->pos++;
+                    state = 11;
+                } else {
+                    syntaxMatch = 0;
+                }
+            break;
+            case 10:
+                if (recognizeCommands(tokenArr)) {
+                    tokenArr->pos++;
+                    state = 12;
+                } else {
+                    syntaxMatch = 0;
+                }
+            break;
+            case 11:
+                if (recognizeAttribution(tokenArr)) {
+                    tokenArr->pos++;
+                    state = 6;
+                } else {
+                    syntaxMatch = 0;
+                }
+            break;
+            case 12:
+                printf("Loop reconhecido");
                 syntaxMatch = 1;
             break;
 
@@ -741,7 +814,7 @@ int recognizeFunctionCall (TokenArr *tokenArr) {
                 }
             break;
             case 3:
-                if (t.type == TYPE_IDENTIFIER) {
+                if (recognizeArgument(tokenArr)) {
                     tokenArr->pos++;
                     state = 4;
                 } else {
@@ -767,7 +840,7 @@ int recognizeFunctionCall (TokenArr *tokenArr) {
     }
 }
 
-int recognizeInput (TokenArr *tokenArr) { //TODO
+int recognizeInput (TokenArr *tokenArr) {
     int state = 0;
     int syntaxMatch = -1;
     int startingToken = tokenArr->pos;
@@ -776,7 +849,7 @@ int recognizeInput (TokenArr *tokenArr) { //TODO
         t = tokenArr->tokens[tokenArr->pos];
         switch (state) {
             case 0:
-                if (t.type == TYPE_KEYWORD && strcmp(t.value, "var") == 0) {
+                if (t.type == TYPE_KEYWORD && strcmp(t.value, "input") == 0) {
                     tokenArr->pos++;
                     state = 1;
                 } else {
@@ -784,7 +857,7 @@ int recognizeInput (TokenArr *tokenArr) { //TODO
                 }
             break;
             case 1:
-                if (t.type == TYPE_DATATYPE) { //identify type here (int, float... -> lexic)
+                if (t.type == TYPE_SEPARATOR && strcmp(t.value, "(") == 0) { //identify type here (int, float... -> lexic)
                     tokenArr->pos++;
                     state = 2;
                 } else {
@@ -800,16 +873,15 @@ int recognizeInput (TokenArr *tokenArr) { //TODO
                 }
             break;
             case 3:
-                if (recognizeDeclareVariable(tokenArr)) {
+                if (t.type == TYPE_SEPARATOR && strcmp(t.value, ")") == 0) {
                     tokenArr->pos++;
                     state = 4;
                 } else {
-                    printf("Variavel reconhecida");
-                    syntaxMatch = 1;
+                    syntaxMatch = 0;
                 }
             break;
             case 4:
-                printf("Variavel reconhecida");
+                printf("Input reconhecido");
                 syntaxMatch = 1;
             break;
 
@@ -819,7 +891,7 @@ int recognizeInput (TokenArr *tokenArr) { //TODO
     }
 }
 
-int recognizePrint (TokenArr *tokenArr) { //TODO
+int recognizePrint (TokenArr *tokenArr) {
     int state = 0;
     int syntaxMatch = -1;
     int startingToken = tokenArr->pos;
@@ -828,7 +900,7 @@ int recognizePrint (TokenArr *tokenArr) { //TODO
         t = tokenArr->tokens[tokenArr->pos];
         switch (state) {
             case 0:
-                if (t.type == TYPE_KEYWORD && strcmp(t.value, "var") == 0) {
+                if (t.type == TYPE_KEYWORD && strcmp(t.value, "print") == 0) {
                     tokenArr->pos++;
                     state = 1;
                 } else {
@@ -836,7 +908,7 @@ int recognizePrint (TokenArr *tokenArr) { //TODO
                 }
             break;
             case 1:
-                if (t.type == TYPE_DATATYPE) { //identify type here (int, float... -> lexic)
+                if (t.type == TYPE_SEPARATOR && strcmp(t.value, "(") == 0) { //identify type here (int, float... -> lexic)
                     tokenArr->pos++;
                     state = 2;
                 } else {
@@ -852,17 +924,35 @@ int recognizePrint (TokenArr *tokenArr) { //TODO
                 }
             break;
             case 3:
-                if (recognizeDeclareVariable(tokenArr)) {
+                if (t.type == TYPE_SEPARATOR && strcmp(t.value, ")") == 0) {
                     tokenArr->pos++;
                     state = 4;
+                } else if (t.type == TYPE_SEPARATOR && strcmp(t.value, ")") == 0) {
+                    tokenArr->pos++;
+                    state = 5;
                 } else {
-                    printf("Variavel reconhecida");
-                    syntaxMatch = 1;
+                    syntaxMatch = 0;
                 }
             break;
             case 4:
-                printf("Variavel reconhecida");
+                printf("Input reconhecido");
                 syntaxMatch = 1;
+            break;
+            case 5:
+                if (recognizeArgument(tokenArr)) {
+                    tokenArr->pos++;
+                    state = 6;
+                } else {
+                    syntaxMatch = 0;
+                }
+            break;
+            case 6:
+                if (t.type == TYPE_SEPARATOR && strcmp(t.value, ")") == 0) {
+                    tokenArr->pos++;
+                    state = 4;
+                } else {
+                    syntaxMatch = 0;
+                }
             break;
 
             default:
@@ -953,6 +1043,45 @@ int recognizeAdditionalCondition(TokenArray *tokenArr) {
                     syntaxMatch = 0;
                 }
             break;
+
+            default:
+                syntaxMatch = 0;
+        }
+    }
+}
+
+int recognizeArgument(TokenArray *tokenArr) {
+    int state = 0;
+    int syntaxMatch = -1;
+    int startingToken = tokenArr->pos;
+    Token t;
+    while (syntaxMatch == -1) {
+        t = tokenArr->tokens[tokenArr->pos];
+        switch (state) {
+            case 0:
+                if (t.type == TYPE_IDENTIFIER || t.type == TYPE_DATATYPE) {
+                    tokenArr->pos++;
+                    state = 1;
+                } else if (recognizeArgument(tokenArr)) {
+                    tokenArr->pos++;
+                    state = 1;
+                } else {
+                    syntaxMatch = 0;
+                }
+            break;
+            case 1:
+                printf("Argumento reconhecido");
+                syntaxMatch = 1;
+            break;
+            case 2:
+                if (recognizeArgument(tokenArray)) {
+                    tokenArr->pos++;
+                    state = 1;
+                } else {
+                    syntaxMatch = 0;
+                }
+            break;
+
 
             default:
                 syntaxMatch = 0;
