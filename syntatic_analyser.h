@@ -1,3 +1,9 @@
+typedef struct _tokenArr {
+    Token tokens[4096];
+    int size;
+    int pos;
+} TokenArr;
+
 void compile(FILE *sourceFile);
 int getTokens(TokenArr *tokenArr, InputStr *str);
 int checkSyntax(TokenArr *tokenArr);
