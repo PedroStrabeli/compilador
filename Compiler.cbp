@@ -31,6 +31,13 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="lexic_analyser.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="syntatic_analyser.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="syntatic_analyser.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
